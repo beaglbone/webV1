@@ -1,0 +1,273 @@
+(function () {
+  /* =========================
+     1️⃣ Inject CSS
+     ========================= */
+  const style = document.createElement("style");
+  style.textContent = `
+    #mp-header {
+      font-family: 'Inter', sans-serif;
+    }
+
+    .ticker-wrap {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-track {
+      display: inline-block;
+      white-space: nowrap;
+      animation: ticker 25s linear infinite;
+    }
+
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .notification-mode {
+      display: flex !important;
+      justify-content: center;
+      align-items: center;
+      animation: none !important;
+      width: 100%;
+      white-space: normal !important;
+      text-align: center;
+      padding: 0 12px;
+      font-size: 0.85rem;
+    }
+
+    .pulse-dot {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+  `;
+  document.head.appendChild(style);
+
+  /* =========================
+     2️⃣ Inject HTML
+     ========================= */
+  const mount = document.getElementById("site-header");
+  if (!mount) return;
+
+  mount.innerHTML = `
+    <div id="mp-header">
+		
+		<!-- Top Bar -->
+		
+		<div class="bg-slate-900 text-white text-sm py-2">
+			<div class="container mx-auto px-4 flex justify-between items-center">
+				<div class="flex items-center space-x-4">
+					<span class="text-gray-400">Markets Open</span>
+					<span class="flex items-center">
+						<span class="w-2 h-2 bg-green-500 rounded-full pulse-dot mr-2"></span>
+						<span class="text-green-400 font-medium">LIVE</span>
+					</span>
+				</div>
+				<div class="hidden md:flex items-center space-x-6 text-gray-300">
+					<span>NSE: 09:15 - 15:30 IST</span>
+					<span>BSE: 09:15 - 15:30 IST</span>
+					<span class="text-yellow-400">Market Status: Open</span>
+				</div>
+			</div>
+		</div>
+
+
+		
+		<!-- Smart Live Ticker (ADD HERE 👇) -->
+		<div class="bg-slate-800 text-white py-2 overflow-hidden">
+			<div class="ticker-wrap">
+				<!-- <div class="ticker text-sm" id="smartTicker"> -->
+					<!-- <!-- Content injected by JS --> 
+				<!-- </div> -->
+				<div id="smartTicker" class="ticker ticker-track text-sm"></div>
+				
+			</div>
+		</div>
+
+
+		<!-- Header -->
+		<header class="bg-white shadow-sm sticky top-0 z-50">
+			<div class="container mx-auto px-4 py-4">
+				<div class="flex justify-between items-center">
+					<div class="flex items-center space-x-3">
+						<div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+							<i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+						</div>
+						<div>
+							<h1 class="text-xl font-bold gradient-text">MarketPulse India</h1>
+							<p class="text-xs text-gray-500">Market Intelligence Platform</p>
+						</div>
+					</div>
+					
+					<nav class="hidden md:flex items-center space-x-8">
+						<a href="#dashboard" class="text-gray-700 hover:text-blue-600 font-medium transition">Dashboard</a>
+						<div class="relative group">
+							<button class="text-gray-700 hover:text-blue-600 font-medium transition flex items-center gap-1">
+								Indices
+								<i data-lucide="chevron-down" class="w-4 h-4"></i>
+							</button>
+
+							<!-- Dropdown -->
+							<div class="absolute left-0 mt-3 w-48 bg-white shadow-lg rounded-xl 
+										opacity-0 invisible group-hover:opacity-100 group-hover:visible
+										transition-all duration-300 z-50">
+
+								<a href="#nifty50" class="block px-4 py-2 hover:bg-gray-100">NIFTY 50</a>
+								<a href="#banknifty" class="block px-4 py-2 hover:bg-gray-100">BANKNIFTY</a>
+								<a href="#sensex" class="block px-4 py-2 hover:bg-gray-100">SENSEX</a>
+								<a href="#finnifty" class="block px-4 py-2 hover:bg-gray-100">FINNIFTY</a>
+
+							</div>
+						</div>
+						<a href="#stocks" class="text-gray-700 hover:text-blue-600 font-medium transition">Stocks</a>
+						<a href="#news" class="text-gray-700 hover:text-blue-600 font-medium transition">News</a>
+						<a href="#analysis" class="text-gray-700 hover:text-blue-600 font-medium transition">Analysis</a>
+					</nav>
+
+					<div class="flex items-center space-x-4">
+						<button class="p-2 hover:bg-gray-100 rounded-lg transition">
+							<i data-lucide="search" class="w-5 h-5 text-gray-600"></i>
+						</button>
+						<button class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition" id="mobileMenuBtn">
+							<i data-lucide="menu" class="w-5 h-5 text-gray-600"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<!-- Mobile Menu -->
+			<div class="md:hidden hidden bg-white border-t" id="mobileMenu">
+				<div class="container mx-auto px-4 py-4 space-y-3">
+					<a href="#dashboard" class="block py-2 text-gray-700 font-medium">Dashboard</a>
+					<div>
+						<button id="mobileIndicesBtn" 
+							class="flex justify-between items-center w-full py-2 text-gray-700 font-medium">
+							Indices
+							<i data-lucide="chevron-down" class="w-4 h-4"></i>
+						</button>
+
+						<div id="mobileIndicesMenu" class="hidden pl-4 space-y-2">
+							<a href="#nifty50" class="block py-1 text-gray-600">NIFTY 50</a>
+							<a href="#banknifty" class="block py-1 text-gray-600">BANKNIFTY</a>
+							<a href="#sensex" class="block py-1 text-gray-600">SENSEX</a>
+							<a href="#finnifty" class="block py-1 text-gray-600">FINNIFTY</a>
+						</div>
+					</div>
+					<a href="#stocks" class="block py-2 text-gray-700 font-medium">Stocks</a>
+					<a href="#news" class="block py-2 text-gray-700 font-medium">News</a>
+					<a href="#analysis" class="block py-2 text-gray-700 font-medium">Analysis</a>
+				</div>
+			</div>
+		</header>
+	</div>
+
+  `;
+
+  /* =========================
+     3️⃣ Component JS Logic
+     ========================= */
+
+  // ticker
+  // mp-header.js
+	function initMPHeader() {
+
+	  // 🔒 HEADER ROOT
+	  const root = document.getElementById("mp-header");
+	  if (!root) return;
+
+	  // Icons
+	  if (window.lucide) {
+		lucide.createIcons();
+	  }
+
+	  // ---------------------------
+	  // Mobile Menu Toggle
+	  // ---------------------------
+	  const btn = root.querySelector("#mobileMenuBtn");
+	  const menu = root.querySelector("#mobileMenu");
+
+	  if (btn && menu) {
+		btn.addEventListener("click", () => {
+		  menu.classList.toggle("hidden");
+		});
+	  }
+
+	  // ---------------------------
+	  // Mobile Indices Dropdown
+	  // ---------------------------
+	  const mobileIndicesBtn = root.querySelector("#mobileIndicesBtn");
+	  const mobileIndicesMenu = root.querySelector("#mobileIndicesMenu");
+
+	  if (mobileIndicesBtn && mobileIndicesMenu) {
+		mobileIndicesBtn.addEventListener("click", () => {
+		  mobileIndicesMenu.classList.toggle("hidden");
+		});
+	  }
+
+	  // ---------------------------
+	  // Smart Live Ticker
+	  // ---------------------------
+	  const ticker = root.querySelector("#smartTicker");
+
+	  const marketData = [
+		{ symbol: 'NIFTY 50', value: '22,456.80', change: '+0.70%' },
+		{ symbol: 'BANKNIFTY', value: '47,892.45', change: '-0.49%' },
+		{ symbol: 'SENSEX', value: '73,745.60', change: '+0.56%' },
+		{ symbol: 'USD/INR', value: '83.12', change: '+0.15%' },
+		{ symbol: 'GOLD', value: '62,450', change: '+0.82%' },
+		{ symbol: 'CRUDE OIL', value: '78.45', change: '+1.23%' }
+	  ];
+
+	  function restartTickerAnimation() {
+		if (!ticker) return;
+		ticker.style.animation = "none";
+		ticker.offsetHeight;
+		ticker.style.animation = "ticker 25s linear infinite";
+	  }
+
+	  function showMarketTicker() {
+		if (!ticker) return;
+
+		let html = "";
+		marketData.forEach(item => {
+		  const color = item.change.startsWith("+")
+			? "text-green-400"
+			: "text-red-400";
+
+		  html += `
+			<span class="inline-flex items-center mx-6">
+			  <span class="font-semibold">${item.symbol}</span>
+			  <span class="ml-2">${item.value}</span>
+			  <span class="ml-2 ${color}">${item.change}</span>
+			</span>
+		  `;
+		});
+
+		ticker.classList.remove("notification-mode");
+		ticker.innerHTML = html + html;
+		restartTickerAnimation();
+	  }
+
+	  function showOfflineMessage() {
+		if (!ticker) return;
+		ticker.classList.add("notification-mode");
+		ticker.style.animation = "none";
+		ticker.innerHTML =
+		  "⚠ You are currently offline. Market data is temporarily unavailable.";
+	  }
+
+	  function checkConnection() {
+		navigator.onLine ? showMarketTicker() : showOfflineMessage();
+	  }
+
+	  window.addEventListener("online", checkConnection);
+	  window.addEventListener("offline", checkConnection);
+
+	  checkConnection();
+	}
+
+})();
