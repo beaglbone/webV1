@@ -5,53 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>MarketPulse India</title>
 
-  <!-- ✅ Google Font (ONCE) -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- ✅ Tailwind (ONCE) -->
+  <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- ✅ Lucide Icons (ONCE) -->
+  <!-- Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body class="bg-gray-50 text-gray-900">
 
-  <!-- 🔽 HEADER INCLUDE -->
+  <!-- HEADER -->
   <div id="header-container"></div>
 
-  <!-- 🔽 PAGE CONTENT -->
+  <!-- PAGE CONTENT -->
   <main class="container mx-auto px-4 py-10">
     <h2 class="text-2xl font-bold mb-4">Home Page</h2>
-    <p class="text-gray-600">
-      This is the homepage content.
-    </p>
+    <p class="text-gray-600">This is the homepage content.</p>
   </main>
 
-  <!-- 🔽 Load header dynamically -->
+  <!-- 1️⃣ Load header HTML -->
   <script>
     fetch("includes/header.html")
       .then(res => res.text())
       .then(html => {
         document.getElementById("header-container").innerHTML = html;
+
+        // 2️⃣ Load header JS AFTER HTML exists
+        const script = document.createElement("script");
+        script.src = "includes/header.js";
+        document.body.appendChild(script);
       });
   </script>
-
-    <!-- Header logic script connector-->
-  <script src="includes/header.js"></script>
-
-  <script>
-    fetch("includes/header.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("header-container").innerHTML = html;
-        initMPHeader(); // 🔥 start header JS
-      });
-  </script>
-
-</body>
 
 </body>
 </html>
