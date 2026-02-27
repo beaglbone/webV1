@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stocks – MarketPulse India</title>
+</head>
+
+<body class="bg-gray-50 text-gray-900">
+
+  <!-- 🔽 HEADER -->
+  <div id="header-container"></div>
+
+  <!-- 🔽 DUMMY PAGE CONTENT -->
+  <main class="container mx-auto px-4 py-10">
+    <h2 class="text-2xl font-bold mb-4">Stocks Page</h2>
+
+    <div class="grid md:grid-cols-3 gap-6">
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="font-semibold">RELIANCE</h3>
+        <p class="text-green-600">₹2,450 (+1.2%)</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="font-semibold">TCS</h3>
+        <p class="text-red-600">₹3,680 (-0.4%)</p>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow">
+        <h3 class="font-semibold">INFY</h3>
+        <p class="text-green-600">₹1,520 (+0.8%)</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- 🔽 Same header include -->
+  <script>
+    fetch("includes/header.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("header-container").innerHTML = html;
+      });
+  </script>
+
+</body>
+</html>
