@@ -28,19 +28,18 @@
     <p class="text-gray-600">This is the homepage content.</p>
   </main>
 
-  <!-- 1️⃣ Load header HTML -->
-  <script>
-    fetch("includes/header.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("header-container").innerHTML = html;
 
-        // 2️⃣ Load header JS AFTER HTML exists
-        const script = document.createElement("script");
-        script.src = "includes/header.js";
-        document.body.appendChild(script);
-      });
-  </script>
+
+<script src="includes/header.js"></script>
+
+<script>
+  fetch("includes/header.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("header-container").innerHTML = html;
+      initMPHeader(); // 🔥 THIS is what starts everything
+    });
+</script>
 
 </body>
 </html>
