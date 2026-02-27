@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarketPulse India - Stock Market News & Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker {
+            display: inline-block;
+            animation: ticker 30s linear infinite;
+        }
+        @keyframes ticker {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .pulse-dot {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .news-card {
+            transition: all 0.3s ease;
+        }
+        .news-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .metric-card {
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+        }
+        .positive { color: #10b981; }
+        .negative { color: #ef4444; }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+    <!-- Top Bar -->
+    <div class="bg-slate-900 text-white text-sm py-2">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-400">Markets Open</span>
+                <span class="flex items-center">
+                    <span class="w-2 h-2 bg-green-500 rounded-full pulse-dot mr-2"></span>
+                    <span class="text-green-400 font-medium">LIVE</span>
+                </span>
+            </div>
+            <div class="hidden md:flex items-center space-x-6 text-gray-300">
+                <span>NSE: 09:15 - 15:30 IST</span>
+                <span>BSE: 09:15 - 15:30 IST</span>
+                <span class="text-yellow-400">Market Status: Open</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Ticker -->
+    <div class="bg-slate-800 text-white py-2 overflow-hidden">
+        <div class="ticker-wrap">
+            <div class="ticker text-sm" id="liveTicker">
+                <!-- Ticker content populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold gradient-text">MarketPulse India</h1>
+                        <p class="text-xs text-gray-500">Market Intelligence Platform</p>
+                    </div>
+                </div>
+                
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#dashboard" class="text-gray-700 hover:text-blue-600 font-medium transition">Dashboard</a>
+                    <a href="#indices" class="text-gray-700 hover:text-blue-600 font-medium transition">Indices</a>
+                    <a href="#stocks" class="text-gray-700 hover:text-blue-600 font-medium transition">Stocks</a>
+                    <a href="#news" class="text-gray-700 hover:text-blue-600 font-medium transition">News</a>
+                    <a href="#analysis" class="text-gray-700 hover:text-blue-600 font-medium transition">Analysis</a>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 hover:bg-gray-100 rounded-lg transition">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                    <button class="md:hidden p-2 hover:bg-gray-100 rounded-lg transition" id="mobileMenuBtn">
+                        <i data-lucide="menu" class="w-5 h-5 text-gray-600"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="md:hidden hidden bg-white border-t" id="mobileMenu">
+            <div class="container mx-auto px-4 py-4 space-y-3">
+                <a href="#dashboard" class="block py-2 text-gray-700 font-medium">Dashboard</a>
+                <a href="#indices" class="block py-2 text-gray-700 font-medium">Indices</a>
+                <a href="#stocks" class="block py-2 text-gray-700 font-medium">Stocks</a>
+                <a href="#news" class="block py-2 text-gray-700 font-medium">News</a>
+                <a href="#analysis" class="block py-2 text-gray-700 font-medium">Analysis</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        <!-- Market Overview -->
+        <section id="dashboard" class="mb-12">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-900">Market Overview</h2>
+                <div class="flex items-center space-x-2 text-sm text-gray-500">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                    <span>Last updated: <span id="lastUpdated">Just now</span></span>
+                </div>
+            </div>
+
+            <!-- Major Indices Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- NIFTY 50 -->
+                <div class="metric-card rounded-2xl p-6 text-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">NIFTY 50</p>
+                            <h3 class="text-3xl font-bold mt-1" id="nifty50Value">22,456.80</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                            <i data-lucide="arrow-up-right" class="w-6 h-6 text-green-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-400 font-semibold" id="nifty50Change">+156.30</span>
+                        <span class="text-green-400 text-sm" id="nifty50Percent">(+0.70%)</span>
+                    </div>
+                    <div class="mt-4 h-16">
+                        <canvas id="nifty50Chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- BANKNIFTY -->
+                <div class="metric-card rounded-2xl p-6 text-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">BANK NIFTY</p>
+                            <h3 class="text-3xl font-bold mt-1" id="bankniftyValue">47,892.45</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+                            <i data-lucide="arrow-down-right" class="w-6 h-6 text-red-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-red-400 font-semibold" id="bankniftyChange">-234.15</span>
+                        <span class="text-red-400 text-sm" id="bankniftyPercent">(-0.49%)</span>
+                    </div>
+                    <div class="mt-4 h-16">
+                        <canvas id="bankniftyChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- SENSEX -->
+                <div class="metric-card rounded-2xl p-6 text-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">SENSEX</p>
+                            <h3 class="text-3xl font-bold mt-1" id="sensexValue">73,745.60</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                            <i data-lucide="arrow-up-right" class="w-6 h-6 text-green-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-green-400 font-semibold" id="sensexChange">+412.80</span>
+                        <span class="text-green-400 text-sm" id="sensexPercent">(+0.56%)</span>
+                    </div>
+                    <div class="mt-4 h-16">
+                        <canvas id="sensexChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- INDIA VIX -->
+                <div class="metric-card rounded-2xl p-6 text-white">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <p class="text-gray-400 text-sm font-medium">INDIA VIX</p>
+                            <h3 class="text-3xl font-bold mt-1" id="vixValue">13.45</h3>
+                        </div>
+                        <div class="w-12 h-12 bg-yellow-500/20 rounded-xl flex items-center justify-center">
+                            <i data-lucide="activity" class="w-6 h-6 text-yellow-400"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-yellow-400 font-semibold" id="vixChange">+0.82</span>
+                        <span class="text-yellow-400 text-sm" id="vixPercent">(+6.49%)</span>
+                    </div>
+                    <div class="mt-4 h-16">
+                        <canvas id="vixChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Breadth -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-semibold text-gray-900 mb-4">Market Breadth - NSE</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Advances</span>
+                            <span class="text-green-600 font-semibold">1,856</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-green-500 h-2 rounded-full" style="width: 62%"></div>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Declines</span>
+                            <span class="text-red-600 font-semibold">1,134</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-red-500 h-2 rounded-full" style="width: 38%"></div>
+                        </div>
+                        <div class="flex justify-between items-center pt-2 border-t">
+                            <span class="text-gray-600">Unchanged</span>
+                            <span class="text-gray-500 font-semibold">142</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-semibold text-gray-900 mb-4">Sector Performance</h3>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">IT</span>
+                            <span class="text-green-600 font-semibold">+2.34%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Pharma</span>
+                            <span class="text-green-600 font-semibold">+1.87%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Auto</span>
+                            <span class="text-green-600 font-semibold">+1.45%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Banking</span>
+                            <span class="text-red-600 font-semibold">-0.49%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">FMCG</span>
+                            <span class="text-red-600 font-semibold">-0.23%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                    <h3 class="font-semibold text-gray-900 mb-4">Top Gainers</h3>
+                    <div class="space-y-3" id="topGainers">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Detailed Charts -->
+        <section id="indices" class="mb-12">
+            <div class="bg-white rounded-2xl shadow-sm p-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                    <h2 class="text-xl font-bold text-gray-900">Index Analysis</h2>
+                    <div class="flex space-x-2 mt-4 md:mt-0">
+                        <button class="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg">1D</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">1W</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">1M</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg">1Y</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mainChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stock Screener -->
+        <section id="stocks" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Stock Screener</h2>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                <div class="p-4 border-b flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+                    <div class="flex space-x-2">
+                        <button class="tab-active px-4 py-2 text-sm font-medium">All Stocks</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900">NIFTY 50</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900">NIFTY Next 50</button>
+                        <button class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900">Midcap</button>
+                    </div>
+                    <div class="relative">
+                        <i data-lucide="search" class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2"></i>
+                        <input type="text" placeholder="Search stocks..." class="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64">
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Symbol</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Change</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">% Change</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Market Cap</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200" id="stockTable">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section -->
+        <section id="news" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Market News</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="newsGrid">
+                <!-- News cards populated by JS -->
+            </div>
+        </section>
+
+        <!-- Technical Analysis -->
+        <section id="analysis" class="mb-12">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Technical Analysis</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Support & Resistance Levels</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg">
+                            <span class="text-red-700 font-medium">Resistance 2</span>
+                            <span class="text-red-700 font-bold">22,800</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-red-50/50 rounded-lg">
+                            <span class="text-red-600 font-medium">Resistance 1</span>
+                            <span class="text-red-600 font-bold">22,650</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                            <span class="text-blue-700 font-medium">Pivot Point</span>
+                            <span class="text-blue-700 font-bold">22,400</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50/50 rounded-lg">
+                            <span class="text-green-600 font-medium">Support 1</span>
+                            <span class="text-green-600 font-bold">22,250</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
+                            <span class="text-green-700 font-medium">Support 2</span>
+                            <span class="text-green-700 font-bold">22,100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm p-6">
+                    <h3 class="font-semibold text-gray-900 mb-4">Technical Indicators</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <p class="font-medium text-gray-900">RSI (14)</p>
+                                <p class="text-sm text-gray-500">Relative Strength Index</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-yellow-600">58.4</span>
+                                <p class="text-sm text-yellow-600">Neutral</p>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-yellow-500 h-2 rounded-full" style="width: 58%"></div>
+                        </div>
+                        
+                        <div class="flex justify-between items-center pt-4 border-t">
+                            <div>
+                                <p class="font-medium text-gray-900">MACD</p>
+                                <p class="text-sm text-gray-500">Moving Average Convergence</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-green-600">+45.2</span>
+                                <p class="text-sm text-green-600">Bullish</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t">
+                            <div>
+                                <p class="font-medium text-gray-900">Moving Averages</p>
+                                <p class="text-sm text-gray-500">20 EMA vs 50 EMA</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-lg font-bold text-green-600">Golden Cross</span>
+                                <p class="text-sm text-green-600">Bullish</p>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-center pt-4 border-t">
+                            <div>
+                                <p class="font-medium text-gray-900">Bollinger Bands</p>
+                                <p class="text-sm text-gray-500">20-period, 2 std dev</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-lg font-bold text-blue-600">Middle Band</span>
+                                <p class="text-sm text-blue-600">Neutral</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">MarketPulse India</h3>
+                    </div>
+                    <p class="text-gray-400 text-sm">Your trusted source for Indian stock market news, data, and analysis. Educational purposes only.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Markets</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition">NIFTY 50</a></li>
+                        <li><a href="#" class="hover:text-white transition">BANK NIFTY</a></li>
+                        <li><a href="#" class="hover:text-white transition">SENSEX</a></li>
+                        <li><a href="#" class="hover:text-white transition">NSE All Indices</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-white transition">Market News</a></li>
+                        <li><a href="#" class="hover:text-white transition">Technical Analysis</a></li>
+                        <li><a href="#" class="hover:text-white transition">Stock Screener</a></li>
+                        <li><a href="#" class="hover:text-white transition">IPO Calendar</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Disclaimer</h4>
+                    <p class="text-gray-400 text-sm">This platform is for informational and educational purposes only. We do not provide investment advice or facilitate trading.</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+                <p class="text-gray-400 text-sm">&copy; 2024 MarketPulse India. All rights reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-lucide="twitter" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-lucide="linkedin" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition">
+                        <i data-lucide="github" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sample stock data
+        const stockData = [
+            { symbol: 'RELIANCE', name: 'Reliance Industries Ltd.', price: 2945.60, change: 45.30, changePercent: 1.56, volume: '8.2M', marketCap: '19.8T' },
+            { symbol: 'TCS', name: 'Tata Consultancy Services', price: 3845.25, change: 89.40, changePercent: 2.38, volume: '2.1M', marketCap: '14.1T' },
+            { symbol: 'HDFCBANK', name: 'HDFC Bank Ltd.', price: 1423.80, change: -12.45, changePercent: -0.87, volume: '5.6M', marketCap: '10.9T' },
+            { symbol: 'INFY', name: 'Infosys Ltd.', price: 1567.90, change: 34.20, changePercent: 2.23, volume: '3.8M', marketCap: '6.5T' },
+            { symbol: 'ICICIBANK', name: 'ICICI Bank Ltd.', price: 978.45, change: 8.90, changePercent: 0.92, volume: '4.2M', marketCap: '6.8T' },
+            { symbol: 'HINDUNILVR', name: 'Hindustan Unilever Ltd.', price: 2345.60, change: -18.30, changePercent: -0.77, volume: '1.2M', marketCap: '5.5T' },
+            { symbol: 'SBIN', name: 'State Bank of India', price: 678.90, change: 15.40, changePercent: 2.32, volume: '12.5M', marketCap: '6.1T' },
+            { symbol: 'BHARTIARTL', name: 'Bharti Airtel Ltd.', price: 945.30, change: 7.80, changePercent: 0.83, volume: '2.8M', marketCap: '5.3T' },
+        ];
+
+        const newsData = [
+            { title: 'RBI Keeps Repo Rate Unchanged at 6.5%', summary: 'The Monetary Policy Committee maintains status quo for the fifth consecutive time, citing inflation concerns.', time: '2 hours ago', category: 'Policy', image: 'http://static.photos/finance/640x360/1' },
+            { title: 'IT Stocks Rally on Strong Q3 Earnings', summary: 'Major IT companies report better-than-expected quarterly results, driving sectoral indices higher.', time: '4 hours ago', category: 'Earnings', image: 'http://static.photos/technology/640x360/2' },
+            { title: 'Government Announces New PLI Scheme for Auto Sector', summary: 'Production-linked incentive scheme extended to boost electric vehicle manufacturing in India.', time: '6 hours ago', category: 'Policy', image: 'http://static.photos/automotive/640x360/3' },
+            { title: 'FIIs Turn Net Buyers After Three Months', summary: 'Foreign institutional investors pump in ₹4,500 crore in Indian equities, signaling positive sentiment.', time: '8 hours ago', category: 'Markets', image: 'http://static.photos/finance/640x360/4' },
+            { title: 'Pharma Sector Gets Boost from US FDA Approvals', summary: 'Multiple Indian pharma companies receive US FDA approvals for generic drugs, shares surge.', time: '10 hours ago', category: 'Pharma', image: 'http://static.photos/medical/640x360/5' },
+            { title: 'Crude Oil Prices Impact Indian Markets', summary: 'Rising crude oil prices put pressure on rupee and oil marketing companies.', time: '12 hours ago', category: 'Commodities', image: 'http://static.photos/industry/640x360/6' },
+        ];
+
+        const topGainers = [
+            { symbol: 'TATAMOTORS', name: 'Tata Motors', change: 5.67 },
+            { symbol: 'WIPRO', name: 'Wipro Ltd.', change: 4.23 },
+            { symbol: 'ADANIENT', name: 'Adani Enterprises', change: 3.89 },
+            { symbol: 'TECHM', name: 'Tech Mahindra', change: 3.45 },
+        ];
+
+        // Populate ticker
+        function populateTicker() {
+            const ticker = document.getElementById('liveTicker');
+            const tickerData = [
+                { symbol: 'NIFTY 50', value: '22,456.80', change: '+0.70%' },
+                { symbol: 'BANKNIFTY', value: '47,892.45', change: '-0.49%' },
+                { symbol: 'SENSEX', value: '73,745.60', change: '+0.56%' },
+                { symbol: 'USD/INR', value: '83.12', change: '+0.15%' },
+                { symbol: 'GOLD', value: '62,450', change: '+0.82%' },
+                { symbol: 'CRUDE OIL', value: '78.45', change: '+1.23%' },
+            ];
+            
+            let tickerHTML = '';
+            tickerData.forEach(item => {
+                const changeColor = item.change.startsWith('+') ? 'text-green-400' : 'text-red-400';
+                tickerHTML += `
+                    <span class="inline-flex items-center mx-6">
+                        <span class="font-semibold">${item.symbol}</span>
+                        <span class="ml-2">${item.value}</span>
+                        <span class="ml-2 ${changeColor}">${item.change}</span>
+                    </span>
+                `;
+            });
+            // Duplicate for seamless loop
+            ticker.innerHTML = tickerHTML + tickerHTML;
+        }
+
+        // Populate stock table
+        function populateStockTable() {
+            const tbody = document.getElementById('stockTable');
+            tbody.innerHTML = stockData.map(stock => {
+                const changeClass = stock.change >= 0 ? 'text-green-600' : 'text-red-600';
+                const changeSign = stock.change >= 0 ? '+' : '';
+                return `
+                    <tr class="hover:bg-gray-50 transition">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="font-semibold text-gray-900">${stock.symbol}</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-gray-600">${stock.name}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right font-medium">₹${stock.price.toLocaleString('en-IN')}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right ${changeClass}">${changeSign}${stock.change.toFixed(2)}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right ${changeClass}">${changeSign}${stock.changePercent.toFixed(2)}%</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-gray-600">${stock.volume}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-gray-600">₹${stock.marketCap}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Populate top gainers
+        function populateTopGainers() {
+            const container = document.getElementById('topGainers');
+            container.innerHTML = topGainers.map(stock => `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-semibold text-gray-900">${stock.symbol}</p>
+                        <p class="text-sm text-gray-500">${stock.name}</p>
+                    </div>
+                    <span class="text-green-600 font-semibold">+${stock.change}%</span>
+                </div>
+            `).join('');
+        }
+
+        // Populate news
+        function populateNews() {
+            const container = document.getElementById('newsGrid');
+            container.innerHTML = newsData.map(news => `
+                <div class="news-card bg-white rounded-2xl shadow-sm overflow-hidden">
+                    <img src="${news.image}" alt="${news.title}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center space-x-2 mb-3">
+                            <span class="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">${news.category}</span>
+                            <span class="text-gray-400 text-sm">${news.time}</span>
+                        </div>
+                        <h3 class="font-semibold text-gray-900 mb-2 line-clamp-2">${news.title}</h3>
+                        <p class="text-gray-600 text-sm line-clamp-3">${news.summary}</p>
+                        <button class="mt-4 text-blue-600 font-medium text-sm hover:text-blue-700 transition">Read more →</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Create mini charts
+        function createMiniChart(canvasId, data, color) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: 20}, (_, i) => i),
+                    datasets: [{
+                        data: data,
+                        borderColor: color,
+                        backgroundColor: color + '20',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { display: false }, y: { display: false } }
+                }
+            });
+        }
+
+        // Create main chart
+        function createMainChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            const labels = Array.from({length: 30}, (_, i) => {
+                const d = new Date();
+                d.setDate(d.getDate() - (29 - i));
+                return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+            });
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'NIFTY 50',
+                        data: [21800, 21950, 21890, 22100, 22250, 22180, 22300, 22450, 22380, 22500, 
+                               22420, 22600, 22550, 22700, 22650, 22800, 22750, 22900, 22850, 23000,
+                               22950, 23100, 23050, 23200, 23150, 23300, 23250, 23400, 23350, 22456],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'BANKNIFTY',
+                        data: [46500, 46800, 46600, 47000, 47300, 47100, 47500, 47800, 47600, 48000,
+                               47800, 48200, 48000, 48400, 48200, 48600, 48400, 48800, 48600, 49000,
+                               48800, 49200, 49000, 49400, 49200, 49600, 49400, 49800, 49600, 47892],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { intersect: false, mode: 'index' },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'end',
+                            labels: { usePointStyle: true, padding: 20 }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0,0,0,0.8)',
+                            padding: 12,
+                            cornerRadius: 8,
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { maxTicksLimit: 6 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString('en-IN');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Simulate real-time updates
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Update NIFTY 50
+                const niftyChange = (Math.random() - 0.5) * 10;
+                const niftyEl = document.getElementById('nifty50Value');
+                let niftyVal = parseFloat(niftyEl.textContent.replace(/,/g, ''));
+                niftyVal += niftyChange;
+                niftyEl.textContent = niftyVal.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                // Update timestamp
+                document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('en-IN');
+            }, 5000);
+        }
+
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', () => {
+            document.getElementById('mobileMenu').classList.toggle('hidden');
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            populateTicker();
+            populateStockTable();
+            populateTopGainers();
+            populateNews();
+            
+            // Create mini charts with sample data
+            createMiniChart('nifty50Chart', 
+                [21800, 21900, 21850, 22000, 22100, 22050, 22150, 22200, 22180, 22250, 
+                 22200, 22300, 22280, 22350, 22320, 22400, 22380, 22450, 22420, 22456],
+                '#10b981'
+            );
+            createMiniChart('bankniftyChart',
+                [48000, 47900, 47950, 47800, 47850, 47820, 47900, 47880, 47950, 47920,
+                 48000, 47950, 48020, 47980, 48050, 48000, 48080, 48040, 48100, 47892],
+                '#ef4444'
+            );
+            createMiniChart('sensexChart',
+                [72800, 73000, 72900, 73200, 73400, 73300, 73500, 73600, 73550, 73700,
+                 73650, 73800, 73750, 73900, 73850, 74000, 73950, 74100, 74050, 73745],
+                '#10b981'
+            );
+            createMiniChart('vixChart',
+                [12.5, 12.8, 12.6, 13.0, 12.9, 13.2, 13.1, 13.4, 13.3, 13.5,
+                 13.4, 13.6, 13.5, 13.7, 13.6, 13.8, 13.7, 13.9, 13.8, 13.45],
+                '#f59e0b'
+            );
+            
+            createMainChart();
+            simulateRealTimeUpdates();
+        });
+    </script>
+</body>
+</html>
