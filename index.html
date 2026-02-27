@@ -39,5 +39,19 @@
       });
   </script>
 
+    <!-- Header logic script connector-->
+  <script src="includes/header.js"></script>
+
+  <script>
+    fetch("includes/header.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("header-container").innerHTML = html;
+        initMPHeader(); // 🔥 start header JS
+      });
+  </script>
+
+</body>
+
 </body>
 </html>
