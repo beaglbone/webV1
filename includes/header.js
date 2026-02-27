@@ -1,12 +1,16 @@
-<script>
-document.addEventListener("DOMContentLoaded", function () {
+// 🔥 MUST be global
+window.initMPHeader = function () {
 
-  // 🔒 HEADER ROOT (THIS is the key)
   const root = document.getElementById("mp-header");
-  if (!root) return;
+  if (!root) {
+    console.warn("mp-header not found");
+    return;
+  }
 
   // Icons
-  lucide.createIcons();
+  if (window.lucide) {
+    lucide.createIcons();
+  }
 
   // ---------------------------
   // Mobile Menu Toggle
@@ -49,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function restartTickerAnimation() {
     if (!ticker) return;
     ticker.style.animation = "none";
-    ticker.offsetHeight; // force reflow
+    ticker.offsetHeight;
     ticker.style.animation = "ticker 25s linear infinite";
   }
 
@@ -92,5 +96,4 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("offline", checkConnection);
 
   checkConnection();
-});
-</script>
+};
