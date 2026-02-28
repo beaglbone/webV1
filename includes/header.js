@@ -47,10 +47,6 @@ async function updateMarketStatus() {
       marketLiveText.textContent = "LIVE";
       marketStatus.textContent = "Market Status: Open";
 
-      if (marketStatusTop) {
-        marketStatusTop.textContent = "Market Status: Open";
-        marketStatusTop.className = "text-green-400";
-      }
 
       marketLiveText.className = "text-green-400 font-medium";
       marketStatus.className = "text-green-400";
@@ -59,10 +55,6 @@ async function updateMarketStatus() {
       marketLiveText.textContent = "CLOSED";
       marketStatus.textContent = "Market Status: Closed";
 
-      if (marketStatusTop) {
-        marketStatusTop.textContent = "Market Status: Closed";
-        marketStatusTop.className = "text-red-400";
-      }
 
       marketLiveText.className = "text-red-400 font-medium";
       marketStatus.className = "text-red-400";
