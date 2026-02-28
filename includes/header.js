@@ -144,5 +144,6 @@ setInterval(updateMarketStatus, 5 * 60 * 1000);
   window.addEventListener("online", checkConnection);
   window.addEventListener("offline", checkConnection);
 
-  checkConnection();
+  // checkConnection();
+  setTimeout(checkConnection, 100);
 };
