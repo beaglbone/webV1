@@ -31,7 +31,7 @@
 
 
 <!-- <script src="includes/header.js"></script> -->
-<script type="module" src="includes/header.js"></script>  
+<!-- <script type="module" src="includes/header.js"></script>  
 
 <script>
   fetch("includes/header.html")
@@ -40,18 +40,32 @@
       document.getElementById("header-container").innerHTML = html;
       initMPHeader(); // 🔥 THIS is what starts everything
     });
-</script>
+</script> -->
 
-  <!-- <script src="includes/mp-header.js"></script>
+<script type="module" src="includes/header.js"></script>  
 
 <script>
+document.addEventListener("DOMContentLoaded", () => {
   fetch("includes/header.html")
     .then(res => res.text())
     .then(html => {
       document.getElementById("header-container").innerHTML = html;
-      initMPHeader(); // 🔥 THIS LINE IS REQUIRED
+
+      setTimeout(() => {
+        if (window.initMPHeader) {
+          window.initMPHeader();
+        }
+      }, 0);
     });
-</script> -->
+});
+</script>
+
+</body>
+</html>  
+  
+  
+
+
 
 </body>
 </html>
