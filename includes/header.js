@@ -24,6 +24,51 @@ window.initMPHeader = function () {
     });
   }
 
+  // ===============================
+// Market Status (Cloudflare API)
+// ===============================
+
+const marketLabel = root.querySelector("#marketLabel");
+const marketLiveText = root.querySelector("#marketLiveText");
+const marketStatus = root.querySelector("#marketStatus");
+
+const MARKET_API = "https://marketholiday.niftyking76.workers.dev/";
+
+async function updateMarketStatus() {
+  try {
+    const res = await fetch(MARKET_API);
+    const data = await res.json();
+
+    const isOpen = data.market === "open";
+
+    if (isOpen) {
+      marketLabel.textContent = "Markets Open";
+      marketLiveText.textContent = "LIVE";
+      marketStatus.textContent = "Market Status: Open";
+
+      marketLiveText.className = "text-green-400 font-medium";
+      marketStatus.className = "text-green-400";
+    } else {
+      marketLabel.textContent = "Markets Closed";
+      marketLiveText.textContent = "CLOSED";
+      marketStatus.textContent = "Market Status: Closed";
+
+      marketLiveText.className = "text-red-400 font-medium";
+      marketStatus.className = "text-red-400";
+    }
+
+  } catch (err) {
+    console.error("Market API error:", err);
+  }
+}
+
+// Run on load
+updateMarketStatus();
+
+// Refresh every 5 minutes
+setInterval(updateMarketStatus, 5 * 60 * 1000); 
+  // here
+
   // ---------------------------
   // Mobile Indices Dropdown
   // ---------------------------
