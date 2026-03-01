@@ -28,7 +28,7 @@
     <p class="text-gray-600">This is the homepage content.</p>
   </main>
 
-
+<div id="site-footer"></div>
 
 <!-- <script src="includes/header.js"></script> -->
 <!-- <script type="module" src="includes/header.js"></script>  
@@ -60,6 +60,20 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 </script> -->
 <script src="includes/load-header.js"></script>
+
+
+<!-- Load Footer -->
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    fetch("includes/footer.html")
+      .then(res => res.text())
+      .then(html => {
+        document.getElementById("site-footer").innerHTML = html;
+        lucide.createIcons();
+      });
+  });
+</script>
+  
 </body>
 </html>  
   
