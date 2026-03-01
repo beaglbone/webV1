@@ -13,54 +13,78 @@
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Lucide -->
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<!-- <body class="bg-gray-50 text-gray-900"> -->
-<body class="min-h-screen flex flex-col bg-gray-50">  
+<body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
+  <!-- Only container here -->
   <div id="header-container"></div>
 
-  <!-- PAGE CONTENT -->
-  <main class="container mx-auto px-4 py-10 flex-grow">
-    <h2 class="text-2xl font-bold mb-4">Home Page</h2>
-    <p class="text-gray-600">This is the homepage content.</p>
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="flex-grow container mx-auto px-4 py-10 space-y-10">
+
+    <!-- Section 1 -->
+    <section>
+      <h2 class="text-3xl font-bold mb-3">Market Overview</h2>
+      <p class="text-gray-600 max-w-2xl">
+        Track Indian stock market indices, global cues, and sector performance
+        in real time. MarketPulse India brings you curated data and insights
+        for educational and research purposes.
+      </p>
+    </section>
+
+    <!-- Section 2 -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold mb-2">NIFTY 50</h3>
+        <p class="text-sm text-gray-600">
+          Live index movement, top gainers and losers, and trend analysis.
+        </p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold mb-2">Stocks</h3>
+        <p class="text-sm text-gray-600">
+          Explore stock performance, charts, and technical indicators.
+        </p>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold mb-2">Market News</h3>
+        <p class="text-sm text-gray-600">
+          Latest market headlines, earnings updates, and macro news.
+        </p>
+      </div>
+    </section>
+
+    <!-- Section 3 -->
+    <section>
+      <h3 class="text-2xl font-semibold mb-2">Why MarketPulse?</h3>
+      <ul class="list-disc list-inside text-gray-600 space-y-1">
+        <li>Clean, fast, and clutter-free UI</li>
+        <li>India-focused market intelligence</li>
+        <li>Educational & research-first platform</li>
+      </ul>
+    </section>
+
   </main>
 
-<div id="site-footer"></div>
+  <!-- ================= FOOTER ================= -->
+  <!-- ONLY 1 container line -->
+  <div id="footer-container"></div>
 
-<!-- <script src="includes/header.js"></script> -->
-<!-- <script type="module" src="includes/header.js"></script>  
+  <!-- ================= SCRIPTS ================= -->
 
-<script>
-  fetch("includes/header.html")
-    .then(res => res.text())
-    .then(html => {
-      document.getElementById("header-container").innerHTML = html;
-      initMPHeader(); // 🔥 THIS is what starts everything
-    });
-</script> -->
+  <!-- Header logic (menu, dropdowns, ticker, etc.) -->
+  <script type="module" src="includes/header.js"></script>
+  <script src="includes/load-header.js"></script>
 
-<script type="module" src="includes/header.js"></script>  
-<script src="includes/load-header.js"></script>
+  <!-- Footer loader (ONLY 1 SCRIPT LINE) -->
+  <script src="includes/load-footer.js"></script>
 
-
-<!-- Load Footer -->
-<script>
-  document.addEventListener("DOMContentLoaded", () => {
-    fetch("includes/footer.html")
-      .then(res => res.text())
-      .then(html => {
-        document.getElementById("site-footer").innerHTML = html;
-        lucide.createIcons();
-      });
-  });
-</script>
-  
 </body>
-</html>  
+</html>
   
   
 
