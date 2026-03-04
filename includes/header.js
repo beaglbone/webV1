@@ -133,7 +133,10 @@ async function fetchMarketData() {
       };
     });
 
-    renderTicker();
+    // renderTicker();
+    if (ticker.innerHTML.trim() === "") {
+      renderTicker();
+    }
 
   } catch (err) {
     console.error("Live market fetch error:", err);
