@@ -94,7 +94,7 @@ setInterval(updateMarketStatus, 5 * 60 * 1000);
     if (!ticker) return;
     ticker.style.animation = "none";
     ticker.offsetHeight;
-    ticker.style.animation = "ticker 40s linear infinite";
+    ticker.style.animation = "ticker 25s linear infinite";
   }
 
  // ===============================
