@@ -90,12 +90,12 @@ setInterval(updateMarketStatus, 5 * 60 * 1000);
   // ---------------------------
   const ticker = root.querySelector("#smartTicker");
 
-  function restartTickerAnimation() {
-    if (!ticker) return;
-    ticker.style.animation = "none";
-    ticker.offsetHeight;
-    ticker.style.animation = "ticker 25s linear infinite";
-  }
+  // function restartTickerAnimation() {
+  //   if (!ticker) return;
+  //   ticker.style.animation = "none";
+  //   ticker.offsetHeight;
+  //   ticker.style.animation = "ticker 25s linear infinite";
+  // }
 
  // ===============================
 // 🔴 LIVE MARKET TICKER
@@ -162,7 +162,7 @@ function renderTicker() {
 
   ticker.classList.remove("notification-mode");
   ticker.innerHTML = html + html;
-  restartTickerAnimation();
+  // restartTickerAnimation();
 }
 
 function showOfflineMessage() {
